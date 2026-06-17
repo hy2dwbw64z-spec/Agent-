@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mój Agent AI</title>
+    
+    <style>
+        body {
+            background-color: #121212;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .chat-container {
+            background-color: #1e1e1e;
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0px 5px 15px rgba(0,0,0,0.5);
+            width: 90%;
+            max-width: 350px;
+        }
+        h2 { text-align: center; margin-top: 0; color: #00adb5; }
+        .chat-box {
+            background-color: #252525;
+            padding: 10px;
+            border-radius: 10px;
+            min-height: 150px;
+            margin-bottom: 15px;
+        }
+        input {
+            width: 70%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #333;
+            color: white;
+        }
+        button {
+            width: 23%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #00adb5;
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+      <h2>Mój Agent Edukacyjny 🤖</h2>
+      <div class="chat-box">
+        <p><strong>Agent:</strong> Cześć! Jestem Twoim osobistym asystentem. O co chcesz mnie zapytać?</p>
+      </div>
+      <input type="text" placeholder="Wpisz pytanie...">
+      <button>Wyślij</button>
+    </div>
+
+    <script>
+        const przycisk = document.querySelector('button');
+        const poleTekstowe = document.querySelector('input');
+        const oknoCzatu = document.querySelector('.chat-box');
+
+        przycisk.addEventListener('click', () => {
+          const tekstUzytkownika = poleTekstowe.value;
+          if (tekstUzytkownika.trim() === '') return;
+
+          oknoCzatu.innerHTML += `<p><strong>Ty:</strong> ${tekstUzytkownika}</p>`;
+          poleTekstowe.value = '';
+
+          setTimeout(() => {
+            let odpowiedzBota = "Ciekawe pytanie! Jako Twój mentor polecam uczyć się dalej JavaScriptu.";
+            if (tekstUzytkownika.toLowerCase().includes('html')) {
+              odpowiedzBota = "HTML to fundamenty! Służy do stawiania ścian i struktury strony.";
+            } else if (tekstUzytkownika.toLowerCase().includes('css')) {
+              odpowiedzBota = "CSS to styl! To dzięki niemu nasz czat ma taki ładny, ciemny motyw.";
+            }
+            oknoCzatu.innerHTML += `<p style="color: #00adb5;"><strong>Agent:</strong> ${odpowiedzBota}</p>`;
+          }, 500);
+        });
+    </script>
+</body>
+</html>
