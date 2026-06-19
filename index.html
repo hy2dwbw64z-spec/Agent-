@@ -7,31 +7,75 @@
     
     <style>
         body {
-            background-color: #121212;
+            background-color: #f4f4f9; /* Jasne tło dla całej strony klienta */
             font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* 1. PRZYCISK OTWIERAJĄCY CZAT (Floating Button) */
+        .chat-launcher {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background-color: #00adb5;
+            border-radius: 50%;
+            box-shadow: 0px 5px 15px rgba(0,0,0,0.3);
+            color: white;
+            font-size: 30px;
+            border: none;
+            cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
+            transition: transform 0.2s;
+            z-index: 1000;
         }
+        .chat-launcher:hover {
+            transform: scale(1.1); /* Efekt lekkiego powiększenia po najechaniu myszką */
+        }
+
+        /* 2. UKRYTE OKNO CZATU */
         .chat-container {
+            position: fixed;
+            bottom: 90px; /* Wyżej niż przycisk, żeby na siebie nie nachodziły */
+            right: 20px;
             background-color: #1e1e1e;
             color: white;
             padding: 20px;
             border-radius: 15px;
-            box-shadow: 0px 5px 15px rgba(0,0,0,0.5);
+            box-shadow: 0px 5px 25px rgba(0,0,0,0.4);
             width: 90%;
             max-width: 350px;
+            z-index: 1000;
+            
+            /* Domyślnie ukrywamy czat */
+            display: none; 
         }
-        h2 { text-align: center; margin-top: 0; color: #00adb5; }
+
+        /* Klasa, którą dodamy przez JavaScript, żeby pokazać czat */
+        .chat-container.active {
+            display: block;
+        }
+
+        h2 { text-align: center; margin-top: 0; color: #00adb5; font-size: 18px; }
+        
         .chat-box {
             background-color: #252525;
             padding: 10px;
             border-radius: 10px;
-            min-height: 150px;
+            height: 250px; /* Trochę wyższy czat, bo na kompie jest miejsce */
+            overflow-y: auto; /* Suwak, gdy wiadomości będzie za dużo */
             margin-bottom: 15px;
         }
+        
+        .chat-input-area {
+            display: flex;
+            justify-content: space-between;
+        }
+
         input {
             width: 70%;
             padding: 10px;
@@ -40,48 +84,74 @@
             background-color: #333;
             color: white;
         }
-        button {
-            width: 23%;
+        
+        button.send-btn {
+            width: 25%;
             padding: 10px;
             border: none;
             border-radius: 5px;
             background-color: #00adb5;
             color: white;
             font-weight: bold;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-    <div class="chat-container">
+    <!-- Udawana strona klienta (żeby było widać, jak bot wtapia się w tło) -->
+    <h1>Witaj na mojej profesjonalnej stronie!</h1>
+    <p>Przeglądasz właśnie ofertę super usług. Spójrz w prawy dolny róg...</p>
+
+    <!-- PRZYCISK DO KLIKANIA -->
+    <button class="chat-launcher" id="launcherBtn">🤖</button>
+
+    <!-- OKIENKO CZATU -->
+    <div class="chat-container" id="chatWindow">
       <h2>Mój Agent Edukacyjny 🤖</h2>
-      <div class="chat-box">
-        <p><strong>Agent:</strong> Cześć! Jestem Twoim osobistym asystentem. O co chcesz mnie zapytać?</p>
+      <div class="chat-box" id="chatBox">
+        <p><strong>Agent:</strong> Cześć! Jestem Twoim asystentem. O co chcesz zapytać? (Wpisz np. html, css, kasa)</p>
       </div>
-      <input type="text" placeholder="Wpisz pytanie...">
-      <button>Wyślij</button>
+      <div class="chat-input-area">
+          <input type="text" id="userInput" placeholder="Wpisz pytanie...">
+          <button class="send-btn" id="sendBtn">Wyślij</button>
+      </div>
     </div>
 
     <script>
-        const przycisk = document.querySelector('button');
-        const poleTekstowe = document.querySelector('input');
-        const oknoCzatu = document.querySelector('.chat-box');
+        const launcherBtn = document.getElementById('launcherBtn');
+        const chatWindow = document.getElementById('chatWindow');
+        const sendBtn = document.getElementById('sendBtn');
+        const userInput = document.getElementById('userInput');
+        const chatBox = document.getElementById('chatBox');
 
-        przycisk.addEventListener('click', () => {
-          const tekstUzytkownika = poleTekstowe.value;
-          if (tekstUzytkownika.trim() === '') return;
+        // FUNKCJA: Otwieranie / Zamykanie okna czatu
+        launcherBtn.addEventListener('click', () => {
+            chatWindow.classList.toggle('active'); // toggle dodaje klasę 'active' jeśli jej nie ma, lub usuwa jeśli jest
+        });
 
-          oknoCzatu.innerHTML += `<p><strong>Ty:</strong> ${tekstUzytkownika}</p>`;
-          poleTekstowe.value = '';
+        // FUNKCJA: Wysyłanie wiadomości
+        sendBtn.addEventListener('click', () => {
+          const tekst = userInput.value;
+          if (tekst.trim() === '') return;
+
+          chatBox.innerHTML += `<p><strong>Ty:</strong> ${tekst}</p>`;
+          userInput.value = '';
 
           setTimeout(() => {
-            let odpowiedzBota = "Ciekawe pytanie! Jako Twój mentor polecam uczyć się dalej JavaScriptu.";
-            if (tekstUzytkownika.toLowerCase().includes('html')) {
-              odpowiedzBota = "HTML to fundamenty! Służy do stawiania ścian i struktury strony.";
-            } else if (tekstUzytkownika.toLowerCase().includes('css')) {
-              odpowiedzBota = "CSS to styl! To dzięki niemu nasz czat ma taki ładny, ciemny motyw.";
+            let tekstMaly = tekst.toLowerCase();
+            let odpowiedz = "Ciekawe... Zapytaj mnie o html, css albo kasa!";
+
+            if (tekstMaly.includes('html')) {
+              odpowiedz = "HTML to szkielet strony.";
+            } else if (tekstMaly.includes('css')) {
+              odpowiedz = "CSS nadaje styl i kolory.";
+            } else if (tekstMaly.includes('kasa') || tekstMaly.includes('zarobki')) {
+              odpowiedz = "Dobry bot to oszczędność kasy dla firmy i zysk dla Ciebie!";
             }
-            oknoCzatu.innerHTML += `<p style="color: #00adb5;"><strong>Agent:</strong> ${odpowiedzBota}</p>`;
+
+            chatBox.innerHTML += `<p style="color: #00adb5;"><strong>Agent:</strong> ${odpowiedz}</p>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
           }, 500);
         });
     </script>
